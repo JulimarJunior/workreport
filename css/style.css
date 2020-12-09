@@ -95,12 +95,12 @@ textarea.form-item {
 
 .btn-item.btn-remove {
 	background-color: #bd2f2f;
-	right: 50px;
+	right: 100px;
 }
 
 .btn-item.btn-pause {
 	background-color: #e3910e;
-	right: 100px;
+	right: 50px;
 }
 
 .card-group:hover .btn-item {
@@ -108,7 +108,18 @@ textarea.form-item {
 }
 
 .card-pause .btn-item.btn-remove {
+	right: 50px;
+}
+
+.card-pause .btn-more {
 	right: 0;
+}
+
+.order-card {
+	width: 1px;
+	height: 1px;
+	position: absolute;
+	opacity: 0;
 }
 
 /*.card-group:hover {
