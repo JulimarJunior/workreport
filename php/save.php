@@ -1,14 +1,22 @@
 <?php
 	require_once('connection.php');
+	require_once('functions.php');
 	$conn = Database::connectionPDO();
+	date_default_timezone_set('America/Sao_Paulo');
 
 	session_start();
+	verifyLogin();
 
 	$date = $_POST['date'];
 	$cards = $_POST['card'];
-	$code_user = $_SESSION['user'];
 	$today = date('Y-m-d H:i');
 	$pause = $_POST['pause'];
+
+	if($_SESSION['view'] != false) {
+		$code_user = $_SESSION['view'];
+	} else {
+		$code_user = $_SESSION['user'];
+	}
 
 	if($pause == 'null') {
 		$pause = NULL;
@@ -71,7 +79,6 @@
 		$code = $conn->prepare($query);
 		$code->bindParam(':code_report', $code_report);
 		$code->execute();
-		
 	}
 	catch(Exception $e) {
 	    echo $e->getMessage();

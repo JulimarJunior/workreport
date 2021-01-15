@@ -1,6 +1,11 @@
 <?php
     session_start();
-    $name = $_SESSION['name'];
+    date_default_timezone_set('America/Sao_Paulo');
+    if(isset($_SESSION['name'])) {
+        $name = $_SESSION['name'];
+        $image = $_SESSION['image'];
+        $adm = $_SESSION['adm'];
+    }
 ?>
 
 <!DOCTYPE html>
@@ -24,21 +29,35 @@
 
 </head>
 <body>
-    <div class="navbar-group">
-        <div class="container">
-            <div class="row">
-                <div class="col-6 pl-0 my-auto">
-                    <ul class="left">
-                        <li><a href="list.php">Meus relatórios</a></li>
-                        <li><a href="">Minha conta</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 pr-0 text-right my-auto">
-                     <ul class="right">
-                        <li><span>Logado como <b><?= $name ?></b></span></li>
-                        <li><a href="php/logout.php">Sair</a></li>
-                    </ul>
+    <?php 
+        if(isset($_SESSION['name'])) {
+        ?>
+        <div class="navbar-group">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6 pl-0 my-auto">
+                        <button class="btn btn-color01 btn-menu" onclick="troggleMenu()"><span class="hamburguer"></span></button>
+                        <ul class="left">
+                            <li><a href="list.php"><img src="img/logo.png" alt="Summer Comunicação" title="Summer Comunicação" style="width: 75px"></a></li>
+                            <li><a href="list.php">Meus relatórios</a></li>
+                            <li><a href="account.php">Minha conta</a></li>
+                            <?php 
+                                if(isset($adm) && $adm == 1) {
+                                    ?><li><a href="admin.php">Administrar</a></li><?php
+                                }
+                            ?>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 pr-0 text-right my-auto">
+                         <ul class="right">
+                            <li class="name-user"><span><b><?= mb_strimwidth($name, 0, 20, "."); ?></b></span></li>
+                            <li><img src="img/user/<?= $image ?>" class="image-user-navbar"></li>
+                            <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i></a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <?php
+        }
+    ?>

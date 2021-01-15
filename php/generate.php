@@ -1,20 +1,27 @@
 <?php
 	require_once('connection.php');
+	require_once('functions.php');
+	date_default_timezone_set('America/Sao_Paulo');
+
+	session_start();
+	verifyLogin();
+
 	$conn = Database::connectionPDO();
 
 	$date = date('d/m/Y', strtotime($_POST['date']));
 
-	session_start();
-	$_SESSION['user'] = 1;
-	$code_user = $_SESSION['user'];
+	if($_SESSION['view'] != false) {
+		$code_user = $_SESSION['view'];
+	} else {
+		$code_user = $_SESSION['user'];
+	}
+	
 
 	try {
-		$code = $conn->prepare("SELECT u.nm_usuario AS name, c.nm_cargo AS role FROM tb_usuario AS u JOIN tb_cargo AS c ON c.cd_cargo = u.cd_cargo WHERE cd_usuario = :code");
+		$code = $conn->prepare("SELECT u.nm_usuario AS name, c.nm_cargo AS role, u.ds_imagem AS image FROM tb_usuario AS u JOIN tb_cargo AS c ON c.cd_cargo = u.cd_cargo WHERE cd_usuario = :code");
 		$code->bindParam(':code',$code_user);
 		$code->execute();
 		$user = $code->fetch(PDO::FETCH_ASSOC);
-		$_SESSION['name'] = $user['name'];
-		$_SESSION['role'] = $user['role'];
 	}
 	catch(Exception $e) {
 	    echo $e->getMessage();
@@ -22,9 +29,9 @@
 
 ?>
 
-	<div class="card-group card-infos row">
+	<div class="card-group card-user row">
 		<div class="col-md-1 pr-0">
-			<div class="image-user">
+			<div class="image-user" style="background-image: url('img/user/<?= $user['image'] ?>');">
 				
 			</div>
 		</div>
@@ -33,9 +40,9 @@
 			<br>
 			<?= $user['role'] ?> 
 		</div>
-		<div class="col-md-4 text-right">
+		<!-- <div class="col-md-4 text-right">
 			<span class="date_report"><?= $date ?></span>
-		</div>
+		</div> -->
 	</div>
 	<div class="mt-3 report">
 		<?php
@@ -51,7 +58,13 @@
 						<b><?= $card['service'] ?></b>
 					</div>
 					<div class="col-12 col-md-8">
-						<b>Descrição: </b><?= $card['description'] ?>
+						<?php
+							if($card['description']) {
+							?>
+							<b>Descrição: </b><?= $card['description'] ?>
+							<?php
+							}
+						?>
 					</div>
 					<?php
 					if($card['card'] != NULL) {
