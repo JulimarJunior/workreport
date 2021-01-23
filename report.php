@@ -76,7 +76,7 @@
 						<i class="fas fa-save"></i>
 					</div>
 				</div>
-				<div class="col-md-2 mb-4 text-right pr-0">
+				<div class="col-md-2 mb-4 text-right pr-0 pl-0">
 					<div class="form-group" style="margin-bottom: 0;">
 						<label for="" class="required">Data do Relatório</label>
 						<input type="date" class="form-item input-date" name="date" onfocus="setDate(value)" onblur="reloadDate(value)" value="<?= $date ?>">
@@ -105,7 +105,7 @@
 				</div>
 				<div class="col-md-4">
 					<div class="form-group">
-						<label for="" class="required">Serviço</label>
+						<label for="" class="required">Cliente</label>
 						<input list="servicesList" type="text" name="card[0][service]" onfocus="focusSave()" onblur="blurSave()" class="form-item input-service">
 					</div>
 				</div>
@@ -128,7 +128,29 @@
 			
 		</form>
 	</div>
-
+	<div class="modal-fullpage" id="alert-pause">
+        <div class="container">
+            <div class="row" style="width: 100%; height: 100vh">
+                <div class="mx-auto my-auto">
+                    <div class="modal-square">
+                        <div class="row modal-content-header" style="margin-left: 0px;">
+                            <div class="col-10">
+                                <h1>Apenas um intervalo por relatório</h1>
+                            </div>
+                            <div class="col-2 text-right">
+                                <button onclick="closeModal()" class="btn btn-color01 btn-return">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            Não é possível adicionar mais do que um intervalo por relatório.                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <?php require_once('php/footer.php'); ?>
 

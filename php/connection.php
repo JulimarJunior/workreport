@@ -4,11 +4,11 @@ class Database
     protected static $db;
     private function __construct()
     {
-        $db_host = "localhost";      // host
-        $db_user = "root";      // user host
-        $db_password = "root";  // password host
-        $db_name = "db_relatorios";      // name database
-        $db_driver = "mysql";    // mysql
+        $db_host = "localhost";
+        $db_user = "root";
+        $db_password = "root";
+        $db_name = "db_relatorios";
+        $db_driver = "mysql";
         $options = array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION );
       
         try

@@ -19,12 +19,33 @@
 		);
 
 		if($_POST['email'] == '' || $_POST['email'] == null || $_POST['password'] == '' || $_POST['password'] == null || $_POST['name'] == '' || $_POST['name'] == null || $_POST['office'] == '' || $_POST['office'] == null) {
-			echo "Informe todos os campos obrigatórios";
+			$msg = array(
+				'msg'  => 'campos',
+				'erro' => true
+			);
+			echo(json_encode($msg));
 			exit;
 		}
 
 		if(!mb_strpos($_POST['email'], '@summercomunicacao.com.br')) {
-			echo "Informe um e-Mail Summer";
+			$msg = array(
+				'msg'  => 'email_summer',
+				'erro' => true
+			);
+			echo(json_encode($msg));
+			exit;
+		}
+
+		$code = $conn->prepare("SELECT cd_usuario FROM tb_usuario WHERE ds_email = :email");
+		$code->bindParam(':email',($data['email']));
+		$code->execute();
+		$email_exist = $code->fetchColumn();
+		if($email_exist) {
+			$msg = array(
+				'msg'  => 'email_cadastrado',
+				'erro' => true
+			);
+			echo(json_encode($msg));
 			exit;
 		}
 
@@ -35,7 +56,11 @@
 
 		if($password == $data['password']) {
 			if($data['passwordNew'] != $data['passwordConfirm']) {
-				echo "Novas senhas não coincidem!";
+				$msg = array(
+					'msg'  => 'senhas_nao_coincidem',
+					'erro' => true
+				);
+				echo(json_encode($msg));
 				exit;
 			}
 			$code = $conn->prepare("INSERT INTO tb_usuario(nm_usuario, cd_cargo, ds_email, ds_senha, ic_administrador) VALUES(:name, :office, :email, :password, :adm);");
@@ -46,10 +71,21 @@
 			$code->bindParam(':office',($data['office']));
 			$code->execute();
 
-			echo true;
+			$code = $conn->prepare("SELECT cd_usuario AS id, nm_usuario AS name, ds_email AS email, cd_cargo AS office FROM tb_usuario WHERE ds_email = :email");
+			$code->bindParam(':email',($data['email']));
+			$code->execute();
+			$user = $code->fetch(PDO::FETCH_ASSOC);
+
+			$user['erro'] = false;
+
+			echo(json_encode($user));
 			exit;
 		} else {
-			echo "Senha atual incorreta!";
+			$msg = array(
+				'msg'  => 'senha_incorreta',
+				'erro' => true
+			);
+			echo(json_encode($msg));
 			exit;
 		}
 	}

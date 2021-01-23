@@ -15,6 +15,7 @@ function addPause(id) {
 		pausePosCard = id;
 	} else {
 		alert("Apenas um intervalo é permitido");
+        showModal('alert-pause');
 	}
 }
 
@@ -47,7 +48,7 @@ function addCard(id) {
 		codeCard += '</div>';
 		codeCard +=	'<div class="col-md-4">';
 		codeCard += 	'<div class="form-group">';
-		codeCard += 		'<label for="" class="required">Serviço</label>';
+		codeCard += 		'<label for="" class="required">Cliente</label>';
 		codeCard += 		'<input type="text" list="servicesList" name="card['+lastCard+'][service]" onfocus="focusSave()" onblur="blurSave()" class="form-item input-service">';
 		codeCard += 	'</div>';
 		codeCard += '</div>';
@@ -81,19 +82,19 @@ $('#generate').validate({
     messages: {
     },
     submitHandler: function(form) {
-      var dados = $(form).serialize();
+        var dados = $(form).serialize();
 
-      $.ajax({
-        type: 'POST',
-        url: document.location.origin + '/relatorios/php/generate.php',
-        data: dados+'&pause='+pausePosCard,
-        success: function(response) {
-        	$('#generate').fadeOut(150);
-        	$('#report .content').html(response);
-        	$('#report').delay(150).fadeIn(150);
-        	saveReport();
-        }
-      })
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/relatorios/php/generate.php',
+            data: dados+'&pause='+pausePosCard,
+            success: function(response) {
+            	$('#generate').fadeOut(150);
+            	$('#report .content').html(response);
+            	$('#report').delay(150).fadeIn(150);
+        	   saveReport();
+            }
+        })
     }
 });
 
@@ -138,6 +139,170 @@ $('#login').validate({
         	returnButton('Acessar','#login button');
         }
       })
+    }
+});
+
+$('#office-register').validate({
+    rules: {
+        'name': {
+            required: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#office-register button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/relatorios/php/register-office.php',
+            data: dados,
+            success: function(response) {
+                $('input').val('');
+                var obj = JSON.parse(response);
+                returnButton('Criar cargo','#office-register button.btn-submit');
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Cargo já existente','error');
+                    }
+                } else {
+                    var item = '<div class="card-group pl-4 card-office-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 my-auto nm_office">'+obj.name+'</div><div class="col-6 text-right"><button onclick="editOffice('+obj.id+')" class="btn btn-color02 mr-2"><i class="fas fa-edit"></i></button><button onclick="removeOffice('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
+                    $('.offices-list').prepend(item);
+                    showAlert('.alert-msg','Cargo criado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Criar cargo','#office-register button.btn-submit');
+            }
+        })
+    }
+});
+
+$('#office-edit').validate({
+    rules: {
+        'name': {
+            required: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#office-edit button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/relatorios/php/register-office.php',
+            data: dados,
+            success: function(response) {
+                returnButton('Editar cargo','#office-edit button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Cargo já existente ou nome sem mudanças','error');
+                    } else {
+                        showAlert('.alert-msg','Algo deu errado, tente novamente','error');
+                    }
+                } else {
+                    $('.card-office-'+obj.id+' .nm_office').text(obj.name);
+                    cancelEdit('office');
+                    showAlert('.alert-msg','Cargo editado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Editar cargo','#office-edit button.btn-submit');
+            }
+        })
+    }
+});
+
+$('#service-register').validate({
+    rules: {
+        'name': {
+            required: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#service-register button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/relatorios/php/register-service.php',
+            data: dados,
+            success: function(response) {
+                $('input').val('');
+                returnButton('Criar cliente','#service-register button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Cliente já existente','error');
+                    } else {
+                        showAlert('.alert-msg','Algo deu errado, tente novamente','error');
+                    }
+                } else {
+                    var item = '<div class="card-group pl-4 card-service-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 my-auto nm_service">'+obj.name+'</div><div class="col-6 text-right"><button onclick="editService('+obj.id+')" class="btn btn-color02 mr-2"><i class="fas fa-edit"></i></button><button onclick="removeService('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
+                    $('.services-list').prepend(item);
+                    showAlert('.alert-msg','Cliente criado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Criar cliente','#service-register button.btn-submit');
+            }
+        })
+    }
+});
+
+$('#service-edit').validate({
+    rules: {
+        'name': {
+            required: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#service-edit button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/relatorios/php/register-service.php',
+            data: dados,
+            success: function(response) {
+                returnButton('Editar cliente','#service-edit button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Cliente já existente ou nome sem mudanças','error');
+                    } else {
+                        showAlert('.alert-msg','Algo deu errado, tente novamente','error');
+                    }
+                } else {
+                    $('.card-service-'+obj.id+' .nm_service').text(obj.name);
+                    cancelEdit('service');
+                    showAlert('.alert-msg','Cliente editado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Editar cliente','#service-edit button.btn-submit');
+            }
+        })
     }
 });
 
@@ -296,26 +461,55 @@ var register = $('#register').validate({
 	        url: document.location.origin + '/relatorios/php/register.php',
 	        data: dados,
 	        success: function(response) {
-        	if(response == true) {
-        		$('input').val('').blur();
-        		register.resetForm();
-        		showAlert('.alert-msg','Conta criada com sucesso','success');
-        		returnButton('Salvar','#register button.btn-submit');
-        	} else {
-        		showAlert('.alert-msg',response,'error');
-        		returnButton('Salvar','#register button.btn-submit');
-        	}
-        },
-        error: function(){
-        	returnButton('Salvar','#register button.btn-submit');
-        }
-      })
+                returnButton('Criar','#register button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'campos') {
+                        showAlert('.alert-msg','Preencha todos os campos obrigatórios','error');
+                    }
+                    if(obj.msg == 'email_summer') {
+                        showAlert('.alert-msg','Informe um email Summer','error');
+                    }
+                    if(obj.msg == 'senhas_nao_coincidem') {
+                        showAlert('.alert-msg','As senhas não coincidem','error');
+                    }
+                    if(obj.msg == 'senha_incorreta') {
+                        showAlert('.alert-msg','Sua senha está incorreta','error');
+                    }
+                    if(obj.msg == 'email_cadastrado') {
+                        showAlert('.alert-msg','E-mail informado já está em uso','error');
+                    }
+                } else {
+                    var office = $('select[name="office"]').val();
+                    if(office == obj.office || office == 'all') {
+                        var item = '<div class="card-group pl-4 card-user-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 nm_user my-auto"><p style="margin: 0">'+obj.name+'</p><span class="email-list d-none d-md-block">'+obj.email+'</span></div><div class="col-6 text-right"><a href="list.php?id='+obj.id+'"><button class="btn btn-color01 mr-2"><i class="far fa-eye"></i></button></a><button onclick="removeUser('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
+                        $('.users-list').prepend(item);
+                    }
+                    showAlert('.alert-msg','Conta criada com sucesso','success');
+                    $('input').val('').blur();
+                    register.resetForm();
+                }
+            	// if(response == true) {
+            	// 	$('input').val('').blur();
+            	// 	register.resetForm();
+            	// 	showAlert('.alert-msg','Conta criada com sucesso','success');
+            	// 	returnButton('Criar','#register button.btn-submit');
+            	// } else {
+            	// 	showAlert('.alert-msg',response,'error');
+            	// 	returnButton('Criar','#register button.btn-submit');
+            	// }
+            },
+            error: function(){
+            	returnButton('Criar','#register button.btn-submit');
+            }
+        })
     }
 });
 
 function showCreateAccount() {
 	$('#listAccounts').fadeOut(150);
 	$('#register').delay(150).fadeIn(150);
+    hideAlert('.alert-msg');
 }
 
 function hideAlert(alert) {
@@ -435,19 +629,28 @@ function showUsersOffice(val) {
 function showOfficesConfig() {
     $('#listAccounts').fadeOut(150);
     $('#offices').delay(150).fadeIn(150);
+    $('#office-register').delay(150).fadeIn(150);
+    $('.offices-list').delay(150).fadeIn(150);
 }
 
 function showServicesConfig() {
     $('#listAccounts').fadeOut(150);
     $('#services').delay(150).fadeIn(150);
+    $('#service-register').delay(150).fadeIn(150);
+    $('.services-list').delay(150).fadeIn(150);
 }
 
 function returnAdm() {
+    editingService = null;
+    editingOffice = null;
+    $('#service-edit').fadeOut(150);
+    $('#office-edit').fadeOut(150);
     $('#register').fadeOut(150);
     $('#offices').fadeOut(150);
     $('#services').fadeOut(150);
     $('#listAccounts').delay(150).fadeIn(150);
     $('input').val('');
+    hideAlert('.alert-msg');
 }
 
 function showModal(modal) {
@@ -486,4 +689,96 @@ function removeUser(id) {
     $('#remove-user b').text(name);
 
     removingUser = id;
+}
+
+function confirmRemoveUser() {
+    closeModal();
+    $.ajax({
+        type: 'POST',
+        url: document.location.origin + '/relatorios/php/remove.php',
+        data: {
+            id: removingUser,
+            type: 'user'
+        },
+        success: function(response) {
+            if(response == true) {
+                $('.card-user-'+removingUser).remove();
+                showAlert('.alert-msg','Usuário removido com sucesso','success');
+            } else {
+                showAlert('.alert-msg',response,'error');
+            }
+        }
+    })
+}
+
+function confirmRemoveOffice() {
+    closeModal();
+    $.ajax({
+        type: 'POST',
+        url: document.location.origin + '/relatorios/php/remove.php',
+        data: {
+            id: removingOffice,
+            type: 'office'
+        },
+        success: function(response) {
+            if(response == true) {
+                $('.card-office-'+removingOffice).remove();
+                showAlert('.alert-msg','Cargo removido com sucesso','success');
+            } else {
+                showAlert('.alert-msg',response,'error');
+            }
+        }
+    })
+}
+
+function confirmRemoveService() {
+    closeModal();
+    $.ajax({
+        type: 'POST',
+        url: document.location.origin + '/relatorios/php/remove.php',
+        data: {
+            id: removingService,
+            type: 'service'
+        },
+        success: function(response) {
+            if(response == true) {
+                $('.card-service-'+removingService).remove();
+                showAlert('.alert-msg','Cliente removido com sucesso','success');
+            } else {
+                showAlert('.alert-msg',removingService,'error');
+            }
+        }
+    })
+}
+
+function editService(id) {
+    hideAlert('.alert-msg');
+    var name = $('.services-list .card-service-'+id+' .nm_service').text().trim();
+    $('#service-register').fadeOut(150);
+    $('.services-list').fadeOut(150);
+    $('#service-edit').delay(150).fadeIn(150);
+
+    $('#service-edit input[type="text"]').val(name);
+    $('#service-edit input[type="hidden"]').val(id);
+}
+
+function editOffice(id) {
+    hideAlert('.alert-msg');
+    var name = $('.offices-list .card-office-'+id+' .nm_office').text().trim();
+    $('#office-register').fadeOut(150);
+    $('.offices-list').fadeOut(150);
+    $('#office-edit').delay(150).fadeIn(150);
+
+    $('#office-edit input[type="text"]').val(name);
+    $('#office-edit input[type="hidden"]').val(id);
+}
+
+function cancelEdit(type) {
+    hideAlert('.alert-msg');
+    editingService = null;
+    editingOffice = null;
+    $('#service-edit').fadeOut(150);
+    $('#office-edit').fadeOut(150);
+    $('#'+type+'-register').delay(150).fadeIn(150);
+    $('.'+type+'s-list').delay(150).fadeIn(150);
 }

@@ -29,6 +29,29 @@
 
 </head>
 <body>
+    <div class="modal-fullpage" id="alert-msg">
+        <div class="container">
+            <div class="row" style="width: 100%; height: 100vh">
+                <div class="mx-auto my-auto">
+                    <div class="modal-square">
+                        <div class="row modal-content-header" style="margin-left: 0px;">
+                            <div class="col-10">
+                                <h1>Título</h1>
+                            </div>
+                            <div class="col-2 text-right">
+                                <button onclick="closeModal()" class="btn btn-color01 btn-return">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <p style="margin: 0">Texto</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <?php 
         if(isset($_SESSION['name'])) {
         ?>
@@ -49,9 +72,9 @@
                         </ul>
                     </div>
                     <div class="col-md-6 pr-0 text-right my-auto">
-                         <ul class="right">
-                            <li class="name-user"><span><b><?= mb_strimwidth($name, 0, 20, "."); ?></b></span></li>
-                            <li><img src="img/user/<?= $image ?>" class="image-user-navbar"></li>
+                        <ul class="right">
+                            <li class="name-user"><a href="account.php" style="color: inherit;"><span><b><?= mb_strimwidth($name, 0, 20, "."); ?></b></span></a></li>
+                            <li><a href="account.php"><img src="img/user/<?= $image ?>" class="image-user-navbar"></a></li>
                             <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i></a></li>
                         </ul>
                     </div>
