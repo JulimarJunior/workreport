@@ -17,11 +17,11 @@
 		$code->bindParam(':email',($_POST['email']));
 		$code->execute();
 		$user = $code->fetch(PDO::FETCH_ASSOC);
-		$password = $user['ds_senha'];
-		if(!$password) {
+		if(!$user) {
 			echo "e-Mail ou senha incorretos";
 			exit;
 		} else {
+			$password = $user['ds_senha'];
 			if(md5($_POST['password']) === $password) {
 				session_start();
 				$_SESSION['user'] = $user['cd_usuario'];
