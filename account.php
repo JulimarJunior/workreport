@@ -13,6 +13,19 @@
 		$code->execute();
 		$user = $code->fetch(PDO::FETCH_ASSOC);
 
+		$code = $conn->prepare("SELECT * FROM tb_remetente ORDER BY nm_remetente");
+		$code->execute();
+		$senders = $code->fetchAll(PDO::FETCH_ASSOC);
+
+		$code = $conn->prepare("SELECT cd_remetente FROM tb_remetente_usuario WHERE cd_usuario = :user");
+		$code->bindParam(':user',($_SESSION['user']));
+		$code->execute();
+		$senders_on_before = $code->fetchAll(PDO::FETCH_ASSOC);
+		$senders_on = array();
+		foreach($senders_on_before as $sender_on_before) {
+			array_push($senders_on, $sender_on_before['cd_remetente']);
+		}
+
 		$code = $conn->prepare("SELECT cd_cargo, nm_cargo FROM tb_cargo ORDER BY nm_cargo");
 		$code->execute();
 		$offices = $code->fetchAll(PDO::FETCH_ASSOC);
@@ -90,6 +103,26 @@
 						<div class="image-user-preview col-md-6 text-right mt-2" style="display: none;">
 							<img src="" alt="">
 						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="row">
+				<div class="col-12">
+					<h1>Destinatários</h1>
+				</div>
+				<div class="col-md-12">
+					<div class="form-group">
+						<label for="">E-mails</label>
+						<select name="senders[]" id="" class="form-item" multiple style="height: auto">
+							<?php
+								foreach($senders as $sender) {
+									?>
+									<option value="<?= $sender['cd_remetente'] ?>" <?= (in_array($sender['cd_remetente'],$senders_on)) ? 'selected' : '' ?>   ><?= $sender['nm_remetente'] ?> - <?= $sender['ds_email'] ?></option>
+									<?php
+								}
+							?>
+						</select>
 					</div>
 				</div>
 			</div>

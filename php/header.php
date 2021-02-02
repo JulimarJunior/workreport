@@ -25,7 +25,7 @@
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <title>Relatórios Summer</title>
+    <title>SummerWorkReport</title>
 
 </head>
 <body>
@@ -61,21 +61,21 @@
                     <div class="col-6 pl-0 my-auto">
                         <button class="btn btn-color01 btn-menu" onclick="troggleMenu()"><span class="hamburguer"></span></button>
                         <ul class="left">
-                            <li><a href="list.php"><img src="img/logo.png" alt="Summer Comunicação" title="Summer Comunicação" style="width: 75px"></a></li>
-                            <li><a href="list.php">Meus relatórios</a></li>
-                            <li><a href="account.php">Minha conta</a></li>
+                            <li><a href="list"><img src="img/logo.png" alt="Summer Comunicação" title="Summer Comunicação" style="width: 75px"></a></li>
+                            <li><a href="list">Meus relatórios</a></li>
+                            <li><a href="account">Minha conta</a></li>
                             <?php 
                                 if(isset($adm) && $adm == 1) {
-                                    ?><li><a href="admin.php">Administrar</a></li><?php
+                                    ?><li><a href="admin">Administrar</a></li><?php
                                 }
                             ?>
                         </ul>
                     </div>
                     <div class="col-md-6 pr-0 text-right my-auto">
                         <ul class="right">
-                            <li class="name-user"><a href="account.php" style="color: inherit;"><span><b><?= mb_strimwidth($name, 0, 20, "."); ?></b></span></a></li>
-                            <li><a href="account.php"><img src="img/user/<?= $image ?>" class="image-user-navbar"></a></li>
-                            <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i></a></li>
+                            <li class="name-user"><a href="account" style="color: inherit;"><span><b><?= mb_strimwidth($name, 0, 20, "."); ?></b></span></a></li>
+                            <li><a href="account"><img src="img/user/<?= $image ?>" class="image-user-navbar"></a></li>
+                            <li><a href="php/logout"><i class="fas fa-sign-out-alt"></i></a></li>
                         </ul>
                     </div>
                 </div>

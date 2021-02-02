@@ -5,9 +5,9 @@ class Database
     private function __construct()
     {
         $db_host = "localhost";
-        $db_user = "root";
-        $db_password = "root";
-        $db_name = "db_relatorios";
+        $db_user = "u312275230_workreport";
+        $db_password = "c#V8IPpfp";
+        $db_name = "u312275230_workreport";
         $db_driver = "mysql";
         $options = array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION );
       

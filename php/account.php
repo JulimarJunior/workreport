@@ -80,7 +80,18 @@
 	          	$_SESSION['image'] = $data['image'];
 	      	} else {
 	      		$data['image'] = $user_infos['ds_imagem'];
-	      	}
+			}
+			 
+			$code = $conn->prepare("DELETE FROM tb_remetente_usuario WHERE cd_usuario = :user");
+			$code->bindParam(':user',($data['id']));
+			$code->execute();
+			
+			foreach($_POST['senders'] as $sender) {
+				$code = $conn->prepare("INSERT INTO tb_remetente_usuario(cd_usuario, cd_remetente) VALUES(:user, :sender);");
+				$code->bindParam(':user',($data['id']));
+				$code->bindParam(':sender', $sender);
+				$code->execute();
+			}
 
 			$code = $conn->prepare("UPDATE tb_usuario SET nm_usuario = :name, ds_email = :email, cd_cargo = :office, ds_imagem = :image WHERE cd_usuario = :user");
 			$code->bindParam(':user',($data['id']));

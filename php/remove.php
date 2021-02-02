@@ -4,6 +4,10 @@
 
 	try {
 		if($_POST['type'] == 'user') {
+			$code = $conn->prepare("DELETE FROM tb_remetente_usuario WHERE cd_usuario = :user");
+			$code->bindParam(':user',($_POST['id']));
+			$code->execute();
+
 			$code = $conn->prepare("SELECT cd_relatorio FROM tb_relatorio WHERE cd_relatorio = :user");
 			$code->bindParam(':user',($_POST['id']));
 			$code->execute();
@@ -58,6 +62,18 @@
 		if($_POST['type'] == 'service') {
 			$code = $conn->prepare("DELETE FROM tb_servico WHERE cd_servico = :service");
 			$code->bindParam(':service',($_POST['id']));
+			$code->execute();
+
+			echo true;
+		}
+
+		if($_POST['type'] == 'sender') {
+			$code = $conn->prepare("DELETE FROM tb_remetente_usuario WHERE cd_remetente = :sender");
+			$code->bindParam(':sender',($_POST['id']));
+			$code->execute();
+
+			$code = $conn->prepare("DELETE FROM tb_remetente WHERE cd_remetente = :sender");
+			$code->bindParam(':sender',($_POST['id']));
 			$code->execute();
 
 			echo true;

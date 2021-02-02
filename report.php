@@ -38,6 +38,11 @@
 		$code = $conn->prepare("SELECT nm_servico as name, cd_servico as code FROM tb_servico");
 		$code->execute();
 		$services = $code->fetchAll(PDO::FETCH_ASSOC);
+
+		$code = $conn->prepare("SELECT cd_remetente FROM tb_remetente_usuario WHERE cd_usuario = :user");
+		$code->bindParam(':user',$user);
+		$code->execute();
+		$senders = $code->fetchAll(PDO::FETCH_ASSOC);
 	}
 	catch(Exception $e) {
 	    echo $e->getMessage();
@@ -66,7 +71,11 @@
 					if(!$_SESSION['view']) {
 						?><button class="w-100 btn-color02 btn mt-2" onclick="editReport()">Editar relatório</button><?php
 					}
+					if($senders) {
+						?><button class="w-100 btn-color01 btn mt-2 btn-send-email" onclick="showModal('confirm-email')">Enviar relatório por E-mail</button><?php
+					}
 				?>
+				
 			</div>
 		</div>
 		<form id="generate">
@@ -123,38 +132,91 @@
 				</div>
 			</div>
 			<div class="row">
-				<button class="w-100 btn-color01 btn mt-4">Salvar relatório</button>
+				<button class="w-100 btn-color01 btn mt-4 btn-submit">Salvar relatório</button>
 			</div>
 			
 		</form>
 	</div>
 	<div class="modal-fullpage" id="alert-pause">
-        <div class="container">
-            <div class="row" style="width: 100%; height: 100vh">
-                <div class="mx-auto my-auto">
-                    <div class="modal-square">
-                        <div class="row modal-content-header" style="margin-left: 0px;">
-                            <div class="col-10">
-                                <h1>Apenas um intervalo por relatório</h1>
-                            </div>
-                            <div class="col-2 text-right">
-                                <button onclick="closeModal()" class="btn btn-color01 btn-return">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            Não é possível adicionar mais do que um intervalo por relatório.                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        	<div class="container">
+            	<div class="row" style="width: 100%; height: 100vh">
+                	<div class="mx-auto my-auto">
+                    	<div class="modal-square">
+                        		<div class="row modal-content-header" style="margin-left: 0px;">
+                            		<div class="col-10">
+                                		<h1>Apenas um intervalo por relatório</h1>
+                            		</div>
+                            		<div class="col-2 text-right">
+                                		<button onclick="closeModal()" class="btn btn-color01 btn-return">
+                                    		<i class="fas fa-times"></i>
+                                		</button>
+                            		</div>
+                        		</div>
+                        		<div class="p-3">
+                            		Não é possível adicionar mais do que um intervalo por relatório.                            
+                        		</div>
+                    	</div>
+               	</div>
+            	</div>
+        	</div>
+    	</div>
+
+	<div class="modal-fullpage" id="confirm-email">
+        	<div class="container">
+            	<div class="row" style="width: 100%; height: 100vh">
+                	<div class="mx-auto my-auto">
+                    	<div class="modal-square">
+                        		<div class="row modal-content-header" style="margin-left: 0px;">
+                            		<div class="col-10">
+                                		<h1>Enviar relatório por E-mail?</h1>
+                            		</div>
+                            		<div class="col-2 text-right">
+                                		<button onclick="closeModal()" class="btn btn-color01 btn-return">
+                                    		<i class="fas fa-times"></i>
+                                		</button>
+                            		</div>
+                        		</div>
+                        		<div class="p-3">
+                            		Tem certeza que deseja enviar o relatório atual por E-mail para seus destinatário?                          
+							<button class="btn btn-color01 w-100 mt-3" onclick="sendReport()">
+                                		Confirmar
+                            		</button>
+                        		</div>
+                    	</div>
+               	</div>
+            	</div>
+        	</div>
+    	</div>
+
+	<div class="modal-fullpage" id="alert-email">
+        	<div class="container">
+            	<div class="row" style="width: 100%; height: 100vh">
+                	<div class="mx-auto my-auto">
+                    	<div class="modal-square">
+                        		<div class="row modal-content-header" style="margin-left: 0px;">
+                            		<div class="col-10">
+                                		<h1>Envio por E-mail</h1>
+                            		</div>
+                            		<div class="col-2 text-right">
+                                		<button onclick="closeModal()" class="btn btn-color01 btn-return">
+                                    		<i class="fas fa-times"></i>
+                                		</button>
+                            		</div>
+                        		</div>
+                        		<div class="p-3">
+                            		<p></p>                            
+                        		</div>
+                    	</div>
+               	</div>
+            	</div>
+        	</div>
+    	</div>
 
 <?php require_once('php/footer.php'); ?>
 
 <script>
+	var dateSend  = '<?= $date ?>';
+	var pauseSend = '<?= $pause ?>';
 	var i = 0;
 	$(document).ready(function(){
 		<?php

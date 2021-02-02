@@ -76,6 +76,13 @@
 			$code->execute();
 			$user = $code->fetch(PDO::FETCH_ASSOC);
 
+			foreach($_POST['senders'] as $sender) {
+				$code = $conn->prepare("INSERT INTO tb_remetente_usuario(cd_usuario, cd_remetente) VALUES(:user, :sender);");
+				$code->bindParam(':user', ($user['id']));
+				$code->bindParam(':sender', $sender);
+				$code->execute();
+			}
+
 			$user['erro'] = false;
 
 			echo(json_encode($user));

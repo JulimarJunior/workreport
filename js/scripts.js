@@ -7,14 +7,15 @@ var imageUser = '';
 var removingOffice;
 var removingService;
 var removingUser;
+var removingSender;
 
 function addPause(id) {
 	if(pauseMax > pauseCurrent) {
 		$('.card-'+id).after(pauseCard);
 		pauseCurrent ++;
-		pausePosCard = id;
+        pausePosCard = id;
+        pauseSend = id;
 	} else {
-		alert("Apenas um intervalo é permitido");
         showModal('alert-pause');
 	}
 }
@@ -83,16 +84,17 @@ $('#generate').validate({
     },
     submitHandler: function(form) {
         var dados = $(form).serialize();
-
+        loadingButton('#generate button.btn-submit');
         $.ajax({
             type: 'POST',
-            url: document.location.origin + '/relatorios/php/generate.php',
+            url: document.location.origin + '/projects/workreport/php/generate.php',
             data: dados+'&pause='+pausePosCard,
             success: function(response) {
             	$('#generate').fadeOut(150);
             	$('#report .content').html(response);
-            	$('#report').delay(150).fadeIn(150);
-        	   saveReport();
+                $('#report').delay(150).fadeIn(150);
+        	    saveReport();
+                returnButton('Salvar relatório','#generate button.btn-submit');
             }
         })
     }
@@ -111,8 +113,8 @@ $('#login').validate({
     },
     messages: {
     	'email': {
-    		required: 'Informe um e-Mail',
-    		email: 'Informe um e-Mail válido'
+    		required: 'Informe um e-mail',
+    		email: 'Informe um e-mail válido'
     	},
     	'password': {
     		required: 'Informe uma senha',
@@ -125,7 +127,7 @@ $('#login').validate({
 
 	    $.ajax({
 	        type: 'POST',
-	        url: document.location.origin + '/relatorios/php/login.php',
+	        url: document.location.origin + '/projects/workreport/php/login.php',
 	        data: dados,
 	        success: function(response) {
         	if(response == true) {
@@ -159,10 +161,9 @@ $('#office-register').validate({
 
         $.ajax({
             type: 'POST',
-            url: document.location.origin + '/relatorios/php/register-office.php',
+            url: document.location.origin + '/projects/workreport/php/register-office.php',
             data: dados,
             success: function(response) {
-                $('input').val('');
                 var obj = JSON.parse(response);
                 returnButton('Criar cargo','#office-register button.btn-submit');
                 if(obj.erro) {
@@ -170,6 +171,7 @@ $('#office-register').validate({
                         showAlert('.alert-msg','Cargo já existente','error');
                     }
                 } else {
+                    $('input').val('');
                     var item = '<div class="card-group pl-4 card-office-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 my-auto nm_office">'+obj.name+'</div><div class="col-6 text-right"><button onclick="editOffice('+obj.id+')" class="btn btn-color02 mr-2"><i class="fas fa-edit"></i></button><button onclick="removeOffice('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
                     $('.offices-list').prepend(item);
                     showAlert('.alert-msg','Cargo criado com sucesso','success');
@@ -199,7 +201,7 @@ $('#office-edit').validate({
 
         $.ajax({
             type: 'POST',
-            url: document.location.origin + '/relatorios/php/register-office.php',
+            url: document.location.origin + '/projects/workreport/php/register-office.php',
             data: dados,
             success: function(response) {
                 returnButton('Editar cargo','#office-edit button.btn-submit');
@@ -240,10 +242,9 @@ $('#service-register').validate({
 
         $.ajax({
             type: 'POST',
-            url: document.location.origin + '/relatorios/php/register-service.php',
+            url: document.location.origin + '/projects/workreport/php/register-service.php',
             data: dados,
             success: function(response) {
-                $('input').val('');
                 returnButton('Criar cliente','#service-register button.btn-submit');
                 var obj = JSON.parse(response);
                 if(obj.erro) {
@@ -253,6 +254,7 @@ $('#service-register').validate({
                         showAlert('.alert-msg','Algo deu errado, tente novamente','error');
                     }
                 } else {
+                    $('input').val('');
                     var item = '<div class="card-group pl-4 card-service-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 my-auto nm_service">'+obj.name+'</div><div class="col-6 text-right"><button onclick="editService('+obj.id+')" class="btn btn-color02 mr-2"><i class="fas fa-edit"></i></button><button onclick="removeService('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
                     $('.services-list').prepend(item);
                     showAlert('.alert-msg','Cliente criado com sucesso','success');
@@ -282,7 +284,7 @@ $('#service-edit').validate({
 
         $.ajax({
             type: 'POST',
-            url: document.location.origin + '/relatorios/php/register-service.php',
+            url: document.location.origin + '/projects/workreport/php/register-service.php',
             data: dados,
             success: function(response) {
                 returnButton('Editar cliente','#service-edit button.btn-submit');
@@ -301,6 +303,114 @@ $('#service-edit').validate({
             },
             error: function(){
                 returnButton('Editar cliente','#service-edit button.btn-submit');
+            }
+        })
+    }
+});
+
+$('#sender-register').validate({
+    rules: {
+        'name': {
+            required: true
+        },
+        'email': {
+            required: true,
+            email: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        },
+        'email': {
+            required: 'Informe um e-mail',
+            email: 'Informe um e-mail válido'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#sender-register button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/projects/workreport/php/register-sender.php',
+            data: dados,
+            success: function(response) {
+                returnButton('Criar remetente','#sender-register button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Remetente já existente','error');
+                    } else {
+                        if(obj.msg == 'email_summer') {
+                            showAlert('.alert-msg','Informe um email Summer','error');
+                        } else {
+                            showAlert('.alert-msg','Algo deu errado, tente novamente','error');
+                        }
+                    }
+                } else {
+                    $('input').val('');
+                    var item = '<div class="card-group pl-4 card-sender-'+obj.id+'"><div class="row" style="width: 100%"><div class="col-6 my-auto nm_sender"><p style="margin: 0">'+obj.name+'</p><span class="email-list d-none d-md-block">'+obj.email+'</span></div><div class="col-6 text-right"><button onclick="editSender('+obj.id+')" class="btn btn-color02 mr-2"><i class="fas fa-edit"></i></button><button onclick="removeSender('+obj.id+')" class="btn btn-color01 btn-remove"><i class="far fa-trash-alt"></i></button></div></div></div>';
+                    $('.senders-list').prepend(item);
+                    showAlert('.alert-msg','Remetente criado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Criar remetente','#service-register button.btn-submit');
+            }
+        })
+    }
+});
+
+$('#sender-edit').validate({
+    rules: {
+        'name': {
+            required: true
+        },
+        'email': {
+            required: true,
+            email: true
+        }
+    },
+    messages: {
+        'name': {
+            required: 'Informe um nome'
+        },
+        'email': {
+            required: 'Informe um e-mail',
+            email: 'Informe um e-mail válido'
+        }
+    },
+    submitHandler: function(form) {
+        var dados = $(form).serialize();
+        loadingButton('#sender-edit button.btn-submit');
+
+        $.ajax({
+            type: 'POST',
+            url: document.location.origin + '/projects/workreport/php/register-sender.php',
+            data: dados,
+            success: function(response) {
+                returnButton('Editar remetente','#sender-edit button.btn-submit');
+                var obj = JSON.parse(response);
+                if(obj.erro) {
+                    if(obj.msg == 'existe') {
+                        showAlert('.alert-msg','Remetente já existente ou nome sem mudanças','error');
+                    } else {
+                        if(obj.msg == 'email_summer') {
+                            showAlert('.alert-msg','Informe um email Summer','error');
+                        } else {
+                            showAlert('.alert-msg','Algo deu errado, tente novamente','error');
+                        }
+                    }
+                } else {
+                    $('.card-sender-'+obj.id+' .nm_sender p').text(obj.name);
+                    $('.card-sender-'+obj.id+' .nm_sender span').text(obj.email);
+                    cancelEdit('sender');
+                    showAlert('.alert-msg','Remetente editado com sucesso','success');
+                }
+            },
+            error: function(){
+                returnButton('Editar remetente','#sender-edit button.btn-submit');
             }
         })
     }
@@ -329,7 +439,7 @@ var account = $('#account').validate({
     	},
     	'passwordNew': {
     		minlength: 8
-    	}
+        }
     },
     messages: {
     	'name': {
@@ -337,8 +447,8 @@ var account = $('#account').validate({
     		minlength: 'Informe um nome válido'
     	},
     	'email': {
-    		required: 'Informe um e-Mail',
-    		email: 'Informe um e-Mail válido'
+    		required: 'Informe um e-mail',
+    		email: 'Informe um e-mail válido'
     	},
     	'password': {
     		required: 'Informe uma senha',
@@ -363,7 +473,7 @@ var account = $('#account').validate({
 
 	    $.ajax({
 	        type: 'POST',
-	        url: document.location.origin + '/relatorios/php/account.php',
+	        url: document.location.origin + '/projects/workreport/php/account.php',
 	        data: dados,
             contentType: false,
             processData: false,
@@ -427,8 +537,8 @@ var register = $('#register').validate({
     		minlength: 'Informe um nome válido'
     	},
     	'email': {
-    		required: 'Informe um e-Mail',
-    		email: 'Informe um e-Mail válido'
+    		required: 'Informe um e-mail',
+    		email: 'Informe um e-mail válido'
     	},
     	'password': {
     		required: 'Informe uma senha',
@@ -458,7 +568,7 @@ var register = $('#register').validate({
 
 	    $.ajax({
 	        type: 'POST',
-	        url: document.location.origin + '/relatorios/php/register.php',
+	        url: document.location.origin + '/projects/workreport/php/register.php',
 	        data: dados,
 	        success: function(response) {
                 returnButton('Criar','#register button.btn-submit');
@@ -477,7 +587,7 @@ var register = $('#register').validate({
                         showAlert('.alert-msg','Sua senha está incorreta','error');
                     }
                     if(obj.msg == 'email_cadastrado') {
-                        showAlert('.alert-msg','E-mail informado já está em uso','error');
+                        showAlert('.alert-msg','e-mail informado já está em uso','error');
                     }
                 } else {
                     var office = $('select[name="office"]').val();
@@ -539,10 +649,35 @@ function saveReport() {
 	var dados = $('#generate').serialize();
 	$.ajax({
 		type: 'POST',
-		url: document.location.origin + '/relatorios/php/save.php',
+		url: document.location.origin + '/projects/workreport/php/save.php',
 		data: dados+'&pause='+pausePosCard,
 		success: function(response) {
 		}
+	})
+}
+
+function sendReport() {
+    closeModal();
+    loadingButton('.btn-send-email');
+	$.ajax({
+		type: 'POST',
+		url: document.location.origin + '/projects/workreport/php/send.php',
+		data: {
+            'date': dateSend,
+            'pause': pauseSend
+        },
+		success: function(response) {
+            if(response == true) {
+                $('#alert-email p').text('Relatório por e-mail enviado com sucesso');
+                showModal('alert-email');
+            } else {
+                $('#alert-email p').text('Ocorreu um erro ao enviar o relatório por e-mail, tente novamente...');
+                showModal('alert-email');
+            }
+        },
+        complete: function() {
+            returnButton('Enviar relatório por E-mail','.btn-send-email');
+        }
 	})
 }
 
@@ -640,14 +775,23 @@ function showServicesConfig() {
     $('.services-list').delay(150).fadeIn(150);
 }
 
+function showSendersConfig() {
+    $('#listAccounts').fadeOut(150);
+    $('#senders').delay(150).fadeIn(150);
+    $('#sender-register').delay(150).fadeIn(150);
+    $('.senders-list').delay(150).fadeIn(150);
+}
+
 function returnAdm() {
     editingService = null;
     editingOffice = null;
     $('#service-edit').fadeOut(150);
     $('#office-edit').fadeOut(150);
+    $('#sender-edit').fadeOut(150);
     $('#register').fadeOut(150);
     $('#offices').fadeOut(150);
     $('#services').fadeOut(150);
+    $('#senders').fadeOut(150);
     $('#listAccounts').delay(150).fadeIn(150);
     $('input').val('');
     hideAlert('.alert-msg');
@@ -683,6 +827,14 @@ function removeService(id) {
     removingService = id;
 }
 
+function removeSender(id) {
+    showModal('remove-sender');
+    var name = $('.card-sender-'+id+' .nm_sender p').text().trim();
+    $('#remove-sender b').text(name);
+
+    removingSender = id;
+}
+
 function removeUser(id) {
     showModal('remove-user');
     var name = $('.card-user-'+id+' .nm_user p').text().trim();
@@ -695,7 +847,7 @@ function confirmRemoveUser() {
     closeModal();
     $.ajax({
         type: 'POST',
-        url: document.location.origin + '/relatorios/php/remove.php',
+        url: document.location.origin + '/projects/workreport/php/remove.php',
         data: {
             id: removingUser,
             type: 'user'
@@ -715,7 +867,7 @@ function confirmRemoveOffice() {
     closeModal();
     $.ajax({
         type: 'POST',
-        url: document.location.origin + '/relatorios/php/remove.php',
+        url: document.location.origin + '/projects/workreport/php/remove.php',
         data: {
             id: removingOffice,
             type: 'office'
@@ -735,7 +887,7 @@ function confirmRemoveService() {
     closeModal();
     $.ajax({
         type: 'POST',
-        url: document.location.origin + '/relatorios/php/remove.php',
+        url: document.location.origin + '/projects/workreport/php/remove.php',
         data: {
             id: removingService,
             type: 'service'
@@ -745,7 +897,27 @@ function confirmRemoveService() {
                 $('.card-service-'+removingService).remove();
                 showAlert('.alert-msg','Cliente removido com sucesso','success');
             } else {
-                showAlert('.alert-msg',removingService,'error');
+                showAlert('.alert-msg',response,'error');
+            }
+        }
+    })
+}
+
+function confirmRemoveSender() {
+    closeModal();
+    $.ajax({
+        type: 'POST',
+        url: document.location.origin + '/projects/workreport/php/remove.php',
+        data: {
+            id: removingSender,
+            type: 'sender'
+        },
+        success: function(response) {
+            if(response == true) {
+                $('.card-sender-'+removingSender).remove();
+                showAlert('.alert-msg','Remetente removido com sucesso','success');
+            } else {
+                showAlert('.alert-msg',response,'error');
             }
         }
     })
@@ -760,6 +932,19 @@ function editService(id) {
 
     $('#service-edit input[type="text"]').val(name);
     $('#service-edit input[type="hidden"]').val(id);
+}
+
+function editSender(id) {
+    hideAlert('.alert-msg');
+    var name  = $('.senders-list .card-sender-'+id+' .nm_sender p').text().trim();
+    var email = $('.senders-list .card-sender-'+id+' .nm_sender span').text().trim();
+    $('#sender-register').fadeOut(150);
+    $('.senders-list').fadeOut(150);
+    $('#sender-edit').delay(150).fadeIn(150);
+
+    $('#sender-edit input[type="text"]').val(name);
+    $('#sender-edit input[type="hidden"]').val(id);
+    $('#sender-edit input[type="email"]').val(email);
 }
 
 function editOffice(id) {
@@ -779,6 +964,7 @@ function cancelEdit(type) {
     editingOffice = null;
     $('#service-edit').fadeOut(150);
     $('#office-edit').fadeOut(150);
+    $('#sender-edit').fadeOut(150);
     $('#'+type+'-register').delay(150).fadeIn(150);
     $('.'+type+'s-list').delay(150).fadeIn(150);
 }
