@@ -25,6 +25,7 @@
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/lmdd.css">
     <title>SummerWorkReport</title>
 
 </head>
@@ -64,6 +65,7 @@
                             <li><a href="list"><img src="img/logo.png" alt="Summer Comunicação" title="Summer Comunicação" style="width: 75px"></a></li>
                             <li><a href="list">Meus relatórios</a></li>
                             <li><a href="account">Minha conta</a></li>
+                            <li><a href="cards">Cartões</a></li>
                             <?php 
                                 if(isset($adm) && $adm == 1) {
                                     ?><li><a href="admin">Administrar</a></li><?php
